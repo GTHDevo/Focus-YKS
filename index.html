@@ -1,90 +1,205 @@
-<!DOCTYPE html><html lang="tr">
+<!DOCTYPE html>
+<html lang="tr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TYT / AYT Study App</title><!-- PWA --><link rel="manifest" href="manifest.json">
+<title>FocusYKS</title>
+
+<link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#215E61">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><style>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<style>
 :root{
---bg1:#F5FBE6;--bg2:#215E61;--text:#0B3C49;--accent:#FE7F2D;
+--bg1:#F5FBE6;
+--bg2:#215E61;
+--text:#F5FBE6;
+--accent:#FE7F2D;
+--frame:#FE7F2D;
+--led:linear-gradient(90deg,#ff004c,#00fff7,#7c7cff,#ff004c);
 }
-body{margin:0;height:100vh;font-family:Arial;background:linear-gradient(160deg,var(--bg1),var(--bg2));color:var(--text);display:flex;flex-direction:column}
-.app{flex:1;display:flex;align-items:center;justify-content:center}
-.card{width:92%;max-width:420px;background:rgba(255,255,255,.2);backdrop-filter:blur(14px);border-radius:22px;padding:20px}
-.timer{font-size:1.6rem;text-align:center;font-weight:bold;margin:12px 0}
-.controls{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+
+body{
+margin:0;height:100vh;
+font-family:Arial;
+background:linear-gradient(160deg,var(--bg1),var(--bg2));
+color:var(--text);
+display:flex;flex-direction:column;
+}
+
+.app{flex:1;display:flex;align-items:center;justify-content:center;}
+.card{
+width:90%;max-width:420px;
+background:rgba(0,0,0,.25);
+backdrop-filter:blur(14px);
+border-radius:22px;padding:22px;
+}
+
+.timer-frame{padding:6px;border-radius:18px;background:var(--frame);margin:14px 0;}
+.countdown{text-align:center;font-size:1.5rem;font-weight:bold;background:rgba(0,0,0,.35);border-radius:14px;padding:10px;}
+
+body.rgb .timer-frame{
+background:var(--led);
+background-size:400% 100%;
+animation:led 4s linear infinite;
+}
+@keyframes led{0%{background-position:0%}100%{background-position:400%}}
+
+.quote{text-align:center;font-style:italic}
+.hapbar{text-align:center;font-size:.85rem;margin-top:8px}
+
+.controls{display:flex;gap:8px;justify-content:center;margin-top:10px}
 .controls button{padding:8px 12px;border:none;border-radius:12px;background:var(--accent);font-weight:bold}
-.modebar{display:flex;gap:6px;margin-top:10px}
-.modebar button{flex:1;border:none;padding:8px;border-radius:10px;background:#00000022}
-.active{background:var(--accent)!important}
-.spotify{margin-top:12px;border-radius:16px;overflow:hidden}
-</style></head>
-<body><div class="app">
+
+#study{display:none}
+.study-buttons button{
+width:100%;margin:6px 0;padding:10px;
+border:none;border-radius:14px;
+background:rgba(255,255,255,.2);color:#fff;font-weight:bold;
+}
+
+.stats{
+margin-top:10px;
+background:rgba(0,0,0,.3);
+border-radius:14px;
+padding:10px;
+font-size:.85rem;
+text-align:center;
+}
+
+.tabbar{display:flex;justify-content:space-around;padding:10px;background:rgba(0,0,0,.35)}
+.tabbar button{
+flex:1;margin:0 6px;padding:10px;
+border:none;border-radius:14px;
+background:rgba(255,255,255,.15);
+color:#fff;font-weight:bold;
+}
+.tabbar button.active{background:var(--accent);color:#000}
+
+.spotify iframe{width:100%;height:80px;border:none;border-radius:16px}
+</style>
+</head>
+
+<body class="rgb">
+
+<audio id="alarm">
+<source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
+</audio>
+
+<div class="app">
 <div class="card">
-<h2 id="title" style="text-align:center">TYT 2026</h2>
-<div class="timer" id="timer">--</div><div class="modebar">
-<button onclick="switchMain('tyt')" class="active" id="btyt">TYT</button>
-<button onclick="switchMain('ayt')" id="bayt">AYT</button>
-</div><hr><h3 style="text-align:center">Çalışma Modu</h3>
+
+<h1 id="title">TYT 2026</h1>
+
+<div class="timer-frame">
+<div class="countdown" id="countdown"></div>
+</div>
+
+<div id="main">
+<div class="quote">Bugün çalıştığın konu, sınavda rahatlıktır.</div>
+<div class="hapbar">Problemlerde önce isteneni belirlemek zaman kazandırır.</div>
+
+<div class="spotify">
+<iframe src="https://open.spotify.com/embed/playlist/37i9dQZF1DX8Uebhn9wzrS"
+allow="encrypted-media"></iframe>
+</div>
+
+<div class="stats" id="stats"></div>
+</div>
+
+<div id="study">
+<div class="study-buttons">
+<button onclick="startStudy(25,true)">⏱ Pomodoro (25 dk)</button>
+<button onclick="startStudy(165,false)">📝 TYT Deneme</button>
+<button onclick="startStudy(180,false)">📝 AYT Deneme</button>
+<button onclick="pauseStudy()">⏸ Durdur</button>
+<button onclick="exitStudy()">⬅ Geri</button>
+</div>
+</div>
+
 <div class="controls">
-<button onclick="startPomodoro()">Pomodoro</button>
-<button onclick="startDeneme('tyt')">TYT Deneme</button>
-<button onclick="startDeneme('ayt')">AYT Deneme</button>
-<button onclick="stopTimer()">Durdur</button>
-</div><div class="spotify">
-<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/37i9dQZF1DX8Uebhn9wzrS" width="100%" height="80" frameBorder="0" allow="encrypted-media"></iframe>
+<button onclick="toggleStudy()">📚 Study</button>
+<button onclick="toggleRGB()">🌈 RGB</button>
+</div>
+
 </div>
 </div>
-</div><script>
-let interval;
-let target;
-let mode="tyt";
-const dates={tyt:new Date('2026-06-20T10:15:00'),ayt:new Date('2026-06-21T10:15:00')};
 
-function updateCountdown(){
- const diff=target-Date.now();
- if(diff<=0){timer.innerText="BİTTİ";clearInterval(interval);return}
- const d=Math.floor(diff/86400000);
- const h=Math.floor(diff/3600000)%24;
- const m=Math.floor(diff/60000)%60;
- const s=Math.floor(diff/1000)%60;
- timer.innerText=`${d}g ${h}s ${m}d ${s}sn`;
+<div class="tabbar">
+<button id="tTYT" class="active" onclick="switchTab('tyt')">TYT</button>
+<button id="tAYT" onclick="switchTab('ayt')">AYT</button>
+</div>
+
+<script>
+const dates={
+tyt:new Date("2026-06-20T10:15:00").getTime(),
+ayt:new Date("2026-06-21T10:15:00").getTime()
+};
+let current="tyt",study=false,remaining=0,isPomodoro=false;
+
+const today=new Date().toDateString();
+let stats=JSON.parse(localStorage.getItem("stats")||"{}");
+if(stats.date!==today) stats={date:today,time:0,pomo:0};
+
+function saveStats(){
+localStorage.setItem("stats",JSON.stringify(stats));
 }
 
-function switchMain(t){
- mode=t;
- document.getElementById('btyt').classList.toggle('active',t==='tyt');
- document.getElementById('bayt').classList.toggle('active',t==='ayt');
- title.innerText=t==='tyt'?'TYT 2026':'AYT 2026';
- target=dates[t];
- clearInterval(interval);
- interval=setInterval(updateCountdown,1000);
- updateCountdown();
+function renderStats(){
+statsDiv.innerText=`Bugün: ${Math.floor(stats.time/60)} dk • ${stats.pomo} pomodoro`;
+}
+const statsDiv=document.getElementById("stats");
+
+function update(){
+if(study){
+countdown.innerText=`${Math.floor(remaining/60)} dk ${remaining%60} sn`;
+remaining--;
+stats.time++;
+if(remaining<=0){
+document.getElementById("alarm").play();
+if(isPomodoro) stats.pomo++;
+saveStats();
+study=false;
+}
+renderStats();
+return;
+}
+const diff=dates[current]-Date.now();
+const d=Math.floor(diff/86400000);
+const h=Math.floor(diff/3600000)%24;
+const m=Math.floor(diff/60000)%60;
+const s=Math.floor(diff/1000)%60;
+countdown.innerText=`${d} gün ${h} sa ${m} dk ${s} sn`;
 }
 
-function startPomodoro(){
- clearInterval(interval);
- let time=25*60;
- interval=setInterval(()=>{
-  if(time<=0){alert('Pomodoro bitti');clearInterval(interval);return}
-  time--;timer.innerText=`${Math.floor(time/60)}:${(time%60).toString().padStart(2,'0')}`;
- },1000);
+function startStudy(min,pomo){
+study=true;remaining=min*60;isPomodoro=pomo;
+main.style.display="none";studyDiv.style.display="block";
+}
+function pauseStudy(){study=false}
+function exitStudy(){
+study=false;
+main.style.display="block";studyDiv.style.display="none";
+}
+function toggleStudy(){startStudy(25,true)}
+function toggleRGB(){document.body.classList.toggle("rgb")}
+function switchTab(t){
+current=t;
+title.innerText=t==="tyt"?"TYT 2026":"AYT 2026";
+tTYT.classList.toggle("active",t==="tyt");
+tAYT.classList.toggle("active",t==="ayt");
 }
 
-function startDeneme(t){
- clearInterval(interval);
- let time=t==='tyt'?165*60:180*60;
- interval=setInterval(()=>{
-  if(time<=0){alert('Deneme bitti');clearInterval(interval);return}
-  time--;timer.innerText=`${Math.floor(time/60)}:${(time%60).toString().padStart(2,'0')}`;
- },1000);
+setInterval(update,1000);
+renderStats();
+</script>
+
+<script>
+if("serviceWorker" in navigator){
+navigator.serviceWorker.register("service-worker.js");
 }
+</script>
 
-function stopTimer(){clearInterval(interval);}
-
-switchMain('tyt');
-
-if('serviceWorker'in navigator){navigator.serviceWorker.register('sw.js');}
-</script></body>
+</body>
 </html>

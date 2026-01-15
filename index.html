@@ -4,168 +4,102 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FocusYKS</title>
-
-<link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#215E61">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
+<meta name="mobile-web-app-capable" content="yes">
 <style>
 :root{
---bg1:#F5FBE6;
---bg2:#215E61;
---text:#F5FBE6;
---accent:#FE7F2D;
---frame:#FE7F2D;
---led:linear-gradient(90deg,#ff004c,#00fff7,#7c7cff,#ff004c);
+--bg1:#F5FBE6;--bg2:#215E61;--text:#215E61;--accent:#FE7F2D;--frame:#FE7F2D;--led:linear-gradient(90deg,#ff004c,#00fff7,#7c7cff,#ff004c);
 }
-
-body{
-margin:0;height:100vh;
-font-family:Arial;
-background:linear-gradient(160deg,var(--bg1),var(--bg2));
-color:var(--text);
-display:flex;flex-direction:column;
-}
-
+body{margin:0;height:100vh;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(160deg,var(--bg1),var(--bg2));color:var(--text);display:flex;flex-direction:column;transition:.4s;}
 .app{flex:1;display:flex;align-items:center;justify-content:center;}
-.card{
-width:90%;max-width:420px;
-background:rgba(0,0,0,.25);
-backdrop-filter:blur(14px);
-border-radius:22px;padding:22px;
-}
-
+.card{width:90%;max-width:420px;background:rgba(0,0,0,.25);backdrop-filter:blur(14px);border-radius:22px;padding:22px;box-shadow:0 20px 40px rgba(0,0,0,.35);}
+h1{text-align:center;margin:6px 0;}
 .timer-frame{padding:6px;border-radius:18px;background:var(--frame);margin:14px 0;}
-.countdown{text-align:center;font-size:1.5rem;font-weight:bold;background:rgba(0,0,0,.35);border-radius:14px;padding:10px;}
-
-body.rgb .timer-frame{
-background:var(--led);
-background-size:400% 100%;
-animation:led 4s linear infinite;
-}
+.countdown{text-align:center;font-size:1.6rem;font-weight:bold;background:rgba(0,0,0,.35);border-radius:14px;padding:10px;}
+body.rgb .timer-frame{background:var(--led);background-size:400% 100%;animation:led 4s linear infinite;}
 @keyframes led{0%{background-position:0%}100%{background-position:400%}}
-
-.quote{text-align:center;font-style:italic}
-.hapbar{text-align:center;font-size:.85rem;margin-top:8px}
-
-.controls{display:flex;gap:8px;justify-content:center;margin-top:10px}
-.controls button{padding:8px 12px;border:none;border-radius:12px;background:var(--accent);font-weight:bold}
-
-#study{display:none}
-.study-buttons button{
-width:100%;margin:6px 0;padding:10px;
-border:none;border-radius:14px;
-background:rgba(255,255,255,.2);color:#fff;font-weight:bold;
-}
-
-.stats{
-margin-top:10px;
-background:rgba(0,0,0,.3);
-border-radius:14px;
-padding:10px;
-font-size:.85rem;
-text-align:center;
-}
-
-.tabbar{display:flex;justify-content:space-around;padding:10px;background:rgba(0,0,0,.35)}
-.tabbar button{
-flex:1;margin:0 6px;padding:10px;
-border:none;border-radius:14px;
-background:rgba(255,255,255,.15);
-color:#fff;font-weight:bold;
-}
-.tabbar button.active{background:var(--accent);color:#000}
-
-.spotify iframe{width:100%;height:80px;border:none;border-radius:16px}
+.quote{text-align:center;font-style:italic;opacity:.9;}
+.hapbar{margin-top:12px;padding:12px;border-radius:14px;background:rgba(0,0,0,.35);font-size:.85rem;text-align:center;display:flex;align-items:center;justify-content:center;min-height:52px;}
+body.night{--bg1:#0F172A;--bg2:#1E293B;--text:#CBD5E1;--accent:#38BDF8;--frame:#38BDF8}
+body.coffee{--bg1:#2B2A2A;--bg2:#3E3B3B;--text:#E6D5B8;--accent:#C58940;--frame:#C58940}
+body.soft{--bg1:#1C1F26;--bg2:#2A2E37;--text:#EAEAEA;--accent:#7AA2FF;--frame:#7AA2FF}
+body.mint{--bg1:#E8F3F1;--bg2:#2C6975;--text:#0B3C49;--accent:#FFC75F;--frame:#FFC75F}
+body.rgb{--bg1:#050505;--bg2:#000;--text:#EFFFFF;--frame:transparent}
+body.rgb.mode1{--led:linear-gradient(90deg,#ff004c,#00fff7,#7c7cff,#ff004c)}
+body.rgb.mode2{--led:linear-gradient(90deg,#00c6ff,#0072ff,#00c6ff)}
+body.rgb.mode3{--led:linear-gradient(90deg,#ff0033,#ff6600,#ff0033)}
+body.rgb.mode4{--led:linear-gradient(90deg,#8f00ff,#d400ff,#8f00ff)}
+.controls{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px;}
+.controls button{padding:8px 12px;border:none;border-radius:12px;background:var(--accent);color:#000;font-weight:bold;}
+#rgbBtn{display:none} body.rgb #rgbBtn{display:inline-block}
+.tabbar{display:flex;justify-content:space-around;padding:10px;background:rgba(0,0,0,.35);}
+.tabbar button{flex:1;margin:0 6px;padding:10px;border:none;border-radius:14px;background:rgba(255,255,255,.15);color:var(--text);font-weight:bold;}
+.tabbar button.active{background:var(--accent);color:#000;}
+.pomodoro-controls{display:flex;gap:8px;justify-content:center;margin-top:12px;}
+.hidden{display:none;}
+.spotifybar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:300px;height:60px;border-radius:16px;overflow:hidden;box-shadow:0 5px 20px rgba(0,0,0,.5);}
+.spotifybar iframe{width:100%;height:100%;border:none;border-radius:16px;}
 </style>
 </head>
-
-<body class="rgb">
-
-<audio id="alarm">
-<source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
-</audio>
+<body class="mode1">
 
 <div class="app">
-<div class="card">
-
+<div class="card" id="mainCard">
 <h1 id="title">TYT 2026</h1>
 
-<div class="timer-frame">
+<div class="timer-frame" id="timerFrame">
 <div class="countdown" id="countdown"></div>
 </div>
 
-<div id="main">
-<div class="quote">Bugün çalıştığın konu, sınavda rahatlıktır.</div>
-<div class="hapbar">Problemlerde önce isteneni belirlemek zaman kazandırır.</div>
+<div class="quote" id="quote"></div>
+<div class="hapbar" id="info"></div>
 
-<div class="spotify">
-<iframe src="https://open.spotify.com/embed/playlist/37i9dQZF1DX8Uebhn9wzrS"
-allow="encrypted-media"></iframe>
-</div>
-
-<div class="stats" id="stats"></div>
-</div>
-
-<div id="study">
-<div class="study-buttons">
-<button onclick="startStudy(25,true)">⏱ Pomodoro (25 dk)</button>
-<button onclick="startStudy(165,false)">📝 TYT Deneme</button>
-<button onclick="startStudy(180,false)">📝 AYT Deneme</button>
-<button onclick="pauseStudy()">⏸ Durdur</button>
-<button onclick="exitStudy()">⬅ Geri</button>
-</div>
+<div class="controls" id="themeControls">
+<button onclick="setTheme('')">🎨</button>
+<button onclick="setTheme('night')">🌙</button>
+<button onclick="setTheme('coffee')">☕</button>
+<button onclick="setTheme('soft')">📘</button>
+<button onclick="setTheme('mint')">🍃</button>
+<button onclick="setTheme('rgb')">🌈</button>
+<button id="rgbBtn" onclick="nextRGB()">LED</button>
 </div>
 
-<div class="controls">
-<button onclick="toggleStudy()">📚 Study</button>
-<button onclick="toggleRGB()">🌈 RGB</button>
+<div class="pomodoro-controls hidden" id="studyControls">
+<button onclick="startPomodoro(25)">25 dk</button>
+<button onclick="startPomodoro(40)">40 dk</button>
+<button onclick="startPomodoro(50)">50 dk</button>
+<button onclick="stopPomodoro()">Durdur</button>
 </div>
+
+<button style="margin-top:10px;" onclick="toggleStudyMode()" id="studyModeBtn">Çalışma Modu</button>
 
 </div>
 </div>
 
 <div class="tabbar">
-<button id="tTYT" class="active" onclick="switchTab('tyt')">TYT</button>
-<button id="tAYT" onclick="switchTab('ayt')">AYT</button>
+<button id="tabTYT" class="active" onclick="switchTab('tyt')">TYT</button>
+<button id="tabAYT" onclick="switchTab('ayt')">AYT</button>
+</div>
+
+<div class="spotifybar">
+<iframe src="https://open.spotify.com/embed/playlist/37i9dQZF1DX8Uebhn9wzrS" allow="encrypted-media"></iframe>
 </div>
 
 <script>
-const dates={
-tyt:new Date("2026-06-20T10:15:00").getTime(),
-ayt:new Date("2026-06-21T10:15:00").getTime()
-};
-let current="tyt",study=false,remaining=0,isPomodoro=false;
+/* Ana timer */
+const dates={tyt:new Date("2026-06-20T10:15:00").getTime(),ayt:new Date("2026-06-21T10:15:00").getTime()};
+let current="tyt";
+let interval;
 
-const today=new Date().toDateString();
-let stats=JSON.parse(localStorage.getItem("stats")||"{}");
-if(stats.date!==today) stats={date:today,time:0,pomo:0};
+const quotes=["Bugün yaptığın tekrar, sınavda saniye kazandırır.","Netler son ayda değil, her gün birikir.","Sessiz çalış, süre seninle olsun."];
+const infos=["Paragrafta ilk okuma ana fikri verir, ikinci okuma tuzakları ayıklar.","Problemlerde işlemden önce ne istendiğini netleştir.","Grafik sorularında önce eksenleri kontrol et.","Türevde artan-azalan yorumu ezberden güçlüdür.","Denklem çözerken köklerin tanım aralığını unutma.","Kimyasal denge sorularında yön değişimi kilittir."];
 
-function saveStats(){
-localStorage.setItem("stats",JSON.stringify(stats));
-}
-
-function renderStats(){
-statsDiv.innerText=`Bugün: ${Math.floor(stats.time/60)} dk • ${stats.pomo} pomodoro`;
-}
-const statsDiv=document.getElementById("stats");
+let rgbMode=1;
+function nextRGB(){if(!document.body.classList.contains("rgb"))return; rgbMode=rgbMode%4+1;document.body.className=`rgb mode${rgbMode}`;}
 
 function update(){
-if(study){
-countdown.innerText=`${Math.floor(remaining/60)} dk ${remaining%60} sn`;
-remaining--;
-stats.time++;
-if(remaining<=0){
-document.getElementById("alarm").play();
-if(isPomodoro) stats.pomo++;
-saveStats();
-study=false;
-}
-renderStats();
-return;
-}
 const diff=dates[current]-Date.now();
+if(diff<=0){countdown.innerText="SINAV BAŞLADI";return;}
 const d=Math.floor(diff/86400000);
 const h=Math.floor(diff/3600000)%24;
 const m=Math.floor(diff/60000)%60;
@@ -173,32 +107,63 @@ const s=Math.floor(diff/1000)%60;
 countdown.innerText=`${d} gün ${h} sa ${m} dk ${s} sn`;
 }
 
-function startStudy(min,pomo){
-study=true;remaining=min*60;isPomodoro=pomo;
-main.style.display="none";studyDiv.style.display="block";
-}
-function pauseStudy(){study=false}
-function exitStudy(){
-study=false;
-main.style.display="block";studyDiv.style.display="none";
-}
-function toggleStudy(){startStudy(25,true)}
-function toggleRGB(){document.body.classList.toggle("rgb")}
+function daily(){const i=new Date().getDate(); quote.innerText=`"${quotes[i%quotes.length]}"`; info.innerText=infos[i%infos.length];}
+
 function switchTab(t){
 current=t;
 title.innerText=t==="tyt"?"TYT 2026":"AYT 2026";
-tTYT.classList.toggle("active",t==="tyt");
-tAYT.classList.toggle("active",t==="ayt");
+tabTYT.classList.toggle("active",t==="tyt");
+tabAYT.classList.toggle("active",t==="ayt");
+update();
 }
+
+function setTheme(t){document.body.className=t||""; if(t==="rgb") document.body.classList.add("mode1"); localStorage.setItem("theme",document.body.className);}
+const saved=localStorage.getItem("theme"); if(saved) document.body.className=saved;
 
 setInterval(update,1000);
-renderStats();
-</script>
+update(); daily();
 
-<script>
-if("serviceWorker" in navigator){
-navigator.serviceWorker.register("service-worker.js");
+/* Study Mod */
+let studyMode=false;
+const mainCard=document.getElementById("mainCard");
+const themeControls=document.getElementById("themeControls");
+const timerFrame=document.getElementById("timerFrame");
+const quoteEl=document.getElementById("quote");
+const infoEl=document.getElementById("info");
+const pomodoroControls=document.getElementById("studyControls");
+let pomodoroInterval;
+
+function toggleStudyMode(){
+studyMode=!studyMode;
+if(studyMode){
+timerFrame.classList.add("hidden");
+quoteEl.classList.add("hidden");
+infoEl.classList.add("hidden");
+themeControls.style.opacity="0.4";
+pomodoroControls.classList.remove("hidden");
+}else{
+timerFrame.classList.remove("hidden");
+quoteEl.classList.remove("hidden");
+infoEl.classList.remove("hidden");
+themeControls.style.opacity="1";
+pomodoroControls.classList.add("hidden");
+stopPomodoro();
 }
+}
+
+/* Pomodoro */
+function startPomodoro(mins){
+stopPomodoro();
+let endTime=Date.now()+mins*60*1000;
+pomodoroInterval=setInterval(()=>{
+let diff=endTime-Date.now();
+if(diff<=0){stopPomodoro();new Audio('https://www.soundjay.com/buttons/sounds/beep-07.mp3').play();return;}
+let m=Math.floor(diff/60000); let s=Math.floor(diff/1000)%60;
+countdown.innerText=`Pomodoro: ${m} dk ${s} sn`;
+},1000);
+}
+
+function stopPomodoro(){clearInterval(pomodoroInterval); update();}
 </script>
 
 </body>

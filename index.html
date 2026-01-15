@@ -5,12 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FocusYKS</title>
 <meta name="theme-color" content="#215E61">
-<meta name="mobile-web-app-capable" content="yes">
 <style>
 :root{
 --bg1:#F5FBE6;--bg2:#215E61;--text:#215E61;--accent:#FE7F2D;--frame:#FE7F2D;--led:linear-gradient(90deg,#ff004c,#00fff7,#7c7cff,#ff004c);
 }
-body{margin:0;height:100vh;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(160deg,var(--bg1),var(--bg2));color:var(--text);display:flex;flex-direction:column;transition:.4s;}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(160deg,var(--bg1),var(--bg2));color:var(--text);display:flex;flex-direction:column;transition:.4s;}
 .app{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;}
 .card{width:90%;max-width:420px;background:rgba(0,0,0,.25);backdrop-filter:blur(14px);border-radius:22px;padding:22px;box-shadow:0 20px 40px rgba(0,0,0,.35);position:relative;}
 h1{text-align:center;margin:6px 0;}
@@ -32,30 +31,31 @@ body.rgb.mode4{--led:linear-gradient(90deg,#8f00ff,#d400ff,#8f00ff)}
 .controls{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px;}
 .controls button{padding:8px 12px;border:none;border-radius:12px;background:var(--accent);color:#000;font-weight:bold;}
 #rgbBtn{display:none} body.rgb #rgbBtn{display:inline-block}
-.tabbar{display:flex;justify-content:space-around;padding:10px;background:rgba(0,0,0,.35);}
-.tabbar button{flex:1;margin:0 6px;padding:10px;border:none;border-radius:14px;background:rgba(255,255,255,.15);color:var(--text);font-weight:bold;}
+.tabbar{display:flex;justify-content:space-around;padding:10px;background:rgba(0,0,0,.35);position:relative;}
+.tabbar button{flex:1;margin:0 6px;padding:10px;border:none;border-radius:14px;background:rgba(255,255,255,.15);color:var(--text);font-weight:bold;position:relative;z-index:1;}
 .tabbar button.active{background:var(--accent);color:#000;}
-.study-bar{display:flex;justify-content:center;gap:6px;margin:14px 0;flex-wrap:wrap;}
+.study-bar{display:flex;justify-content:center;gap:6px;margin:0;position:absolute;left:50%;transform:translateX(-50%);top:0;z-index:0;}
 .study-bar button, .study-bar select{padding:6px 10px;border:none;border-radius:10px;background:#fff;color:#000;font-weight:bold;}
 .hidden{display:none;}
-.spotifybar{position:absolute;bottom:-75px;left:50%;transform:translateX(-50%);width:90%;height:70px;background:transparent;display:flex;align-items:center;justify-content:center;z-index:100;}
+.spotifybar{position:fixed;top:10px;left:50%;transform:translateX(-50%);width:90%;height:70px;display:flex;align-items:center;justify-content:center;z-index:100;}
 .spotifybar iframe{width:100%;height:60px;border:none;border-radius:16px;}
 .stats-bar{margin-top:10px;text-align:center;font-size:0.85rem;opacity:.9;}
 </style>
 </head>
 <body class="mode1">
 
+<div class="spotifybar">
+<iframe src="https://open.spotify.com/embed/playlist/37i9dQZF1DX8Uebhn9wzrS" allow="encrypted-media"></iframe>
+</div>
+
 <div class="app">
 <div class="card" id="mainCard">
 <h1 id="title">TYT 2026</h1>
-
 <div class="timer-frame" id="timerFrame">
 <div class="countdown" id="countdown"></div>
 </div>
-
 <div class="quote" id="quote"></div>
 <div class="hapbar" id="info"></div>
-
 <div class="controls" id="themeControls">
 <button onclick="setTheme('')">🎨</button>
 <button onclick="setTheme('night')">🌙</button>
@@ -65,7 +65,13 @@ body.rgb.mode4{--led:linear-gradient(90deg,#8f00ff,#d400ff,#8f00ff)}
 <button onclick="setTheme('rgb')">🌈</button>
 <button id="rgbBtn" onclick="nextRGB()">LED</button>
 </div>
+<div class="stats-bar" id="statsBar">Bugün toplam çalışma: 0 dk</div>
+</div>
+</div>
 
+<div class="tabbar">
+<button id="tabTYT" class="active" onclick="switchTab('tyt')">TYT</button>
+<button id="tabAYT" onclick="switchTab('ayt')">AYT</button>
 <div class="study-bar hidden" id="studyBar">
 <button onclick="startPomodoro(25)">Pomodoro 25dk</button>
 <button onclick="startPomodoro(40)">Pomodoro 40dk</button>
@@ -79,29 +85,21 @@ body.rgb.mode4{--led:linear-gradient(90deg,#8f00ff,#d400ff,#8f00ff)}
 <option value="https://www.soundjay.com/buttons/sounds/button-3.mp3">Ding</option>
 </select>
 </div>
-
-<button style="margin-top:10px;" onclick="toggleStudyMode()" id="studyModeBtn">Çalışma Modu</button>
-
-<div class="stats-bar" id="statsBar">Bugün toplam çalışma: 0 dk</div>
-
-<div class="spotifybar">
-<iframe src="https://open.spotify.com/embed/playlist/37i9dQZF1DX8Uebhn9wzrS" allow="encrypted-media"></iframe>
-</div>
-</div>
-</div>
-
-<div class="tabbar">
-<button id="tabTYT" class="active" onclick="switchTab('tyt')">TYT</button>
-<button id="tabAYT" onclick="switchTab('ayt')">AYT</button>
 </div>
 
 <script>
-/* Ana timer */
 const dates={tyt:new Date("2026-06-20T10:15:00").getTime(),ayt:new Date("2026-06-21T10:15:00").getTime()};
-let current="tyt";
-const quotes=["Bugün yaptığın tekrar, sınavda saniye kazandırır.","Netler son ayda değil, her gün birikir.","Sessiz çalış, süre seninle olsun."];
+let current="tyt"; const quotes=["Bugün yaptığın tekrar, sınavda saniye kazandırır.","Netler son ayda değil, her gün birikir.","Sessiz çalış, süre seninle olsun."];
 const infos=["Paragrafta ilk okuma ana fikri verir, ikinci okuma tuzakları ayıklar.","Problemlerde işlemden önce ne istendiğini netleştir.","Grafik sorularında önce eksenleri kontrol et.","Türevde artan-azalan yorumu ezberden güçlüdür.","Denklem çözerken köklerin tanım aralığını unutma.","Kimyasal denge sorularında yön değişimi kilittir."];
-let rgbMode=1;
+let rgbMode=1; let studyMode=false; let pomodoroInterval; let todayWork=parseInt(localStorage.getItem("todayWork")||"0");
+
+const mainCard=document.getElementById("mainCard");
+const themeControls=document.getElementById("themeControls");
+const timerFrame=document.getElementById("timerFrame");
+const quoteEl=document.getElementById("quote");
+const infoEl=document.getElementById("info");
+const studyBar=document.getElementById("studyBar");
+const statsBar=document.getElementById("statsBar");
 
 function nextRGB(){if(!document.body.classList.contains("rgb"))return; rgbMode=rgbMode%4+1;document.body.className=`rgb mode${rgbMode}`;}
 function update(){const diff=dates[current]-Date.now(); if(diff<=0){countdown.innerText="SINAV BAŞLADI";return;} const d=Math.floor(diff/86400000); const h=Math.floor(diff/3600000)%24; const m=Math.floor(diff/60000)%60; const s=Math.floor(diff/1000)%60; countdown.innerText=`${d} gün ${h} sa ${m} dk ${s} sn`;}
@@ -111,62 +109,13 @@ function setTheme(t){document.body.className=t||""; if(t==="rgb") document.body.
 const saved=localStorage.getItem("theme"); if(saved) document.body.className=saved;
 setInterval(update,1000); update(); daily();
 
-/* Study Mod */
-let studyMode=false;
-const mainCard=document.getElementById("mainCard");
-const themeControls=document.getElementById("themeControls");
-const timerFrame=document.getElementById("timerFrame");
-const quoteEl=document.getElementById("quote");
-const infoEl=document.getElementById("info");
-const studyBar=document.getElementById("studyBar");
-const statsBar=document.getElementById("statsBar");
-let pomodoroInterval;
-let todayWork=parseInt(localStorage.getItem("todayWork")||"0");
-updateStats();
+function toggleStudyMode(){studyMode=!studyMode; studyBar.classList.toggle("hidden",!studyMode); timerFrame.classList.toggle("hidden",studyMode); quoteEl.classList.toggle("hidden",studyMode); infoEl.classList.toggle("hidden",studyMode); stopPomodoro();}
 
-function updateStats(){statsBar.innerText=`Bugün toplam çalışma: ${todayWork} dk`;}
-
-function toggleStudyMode(){
-studyMode=!studyMode;
-document.body.classList.toggle("study",studyMode);
-if(studyMode){
-timerFrame.classList.add("hidden"); quoteEl.classList.add("hidden"); infoEl.classList.add("hidden");
-studyBar.classList.remove("hidden"); themeControls.style.opacity="0.5";
-stopPomodoro();
-}else{
-timerFrame.classList.remove("hidden"); quoteEl.classList.remove("hidden"); infoEl.classList.remove("hidden");
-studyBar.classList.add("hidden"); themeControls.style.opacity="1";
-stopPomodoro(); update(); updateStats();
-}
-}
-
-/* Pomodoro */
-function startPomodoro(mins){
-stopPomodoro();
-let endTime=Date.now()+mins*60*1000;
-pomodoroInterval=setInterval(()=>{
-let diff=endTime-Date.now();
-if(diff<=0){stopPomodoro();playSound(); todayWork+=mins; localStorage.setItem("todayWork",todayWork); updateStats(); return;}
-let m=Math.floor(diff/60000); let s=Math.floor(diff/1000)%60;
-countdown.innerText=`Pomodoro: ${m} dk ${s} sn`;
-},1000);
-}
-
+function startPomodoro(mins){stopPomodoro(); let endTime=Date.now()+mins*60*1000; pomodoroInterval=setInterval(()=>{let diff=endTime-Date.now(); if(diff<=0){stopPomodoro(); playSound(); todayWork+=mins; localStorage.setItem("todayWork",todayWork); updateStats(); return;} let m=Math.floor(diff/60000); let s=Math.floor(diff/1000)%60; countdown.innerText=`Pomodoro: ${m} dk ${s} sn`;},1000);}
 function stopPomodoro(){clearInterval(pomodoroInterval); update();}
-
-/* Deneme Modları */
-function startDeneme(type){
-stopPomodoro();
-countdown.innerText=`${type.toUpperCase()} Deneme Modu Başladı!`;
-let dur=60; // Örnek süre 60dk
-pomodoroInterval=setInterval(()=>{
-dur--; if(dur<=0){stopPomodoro();playSound(); todayWork+=60; localStorage.setItem("todayWork",todayWork); updateStats(); return;}
-countdown.innerText=`${type.toUpperCase()} Deneme: ${dur} dk`;
-},60000);
-}
-
-/* Ses seçimi */
+function startDeneme(type){stopPomodoro(); let dur=60; countdown.innerText=`${type.toUpperCase()} Deneme Modu Başladı!`; pomodoroInterval=setInterval(()=>{dur--; if(dur<=0){stopPomodoro(); playSound(); todayWork+=60; localStorage.setItem("todayWork",todayWork); updateStats(); return;} countdown.innerText=`${type.toUpperCase()} Deneme: ${dur} dk`;},60000);}
 function playSound(){let sel=document.getElementById("soundSelect"); let audio=new Audio(sel.value); audio.play();}
+function updateStats(){statsBar.innerText=`Bugün toplam çalışma: ${todayWork} dk`;}
 </script>
 </body>
 </html>

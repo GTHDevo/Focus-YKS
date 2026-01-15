@@ -12,13 +12,13 @@
 }
 body{margin:0;height:100vh;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(160deg,var(--bg1),var(--bg2));color:var(--text);display:flex;flex-direction:column;transition:.4s;}
 .app{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;}
-.card{width:90%;max-width:420px;background:rgba(0,0,0,.25);backdrop-filter:blur(14px);border-radius:22px;padding:22px;box-shadow:0 20px 40px rgba(0,0,0,.35);}
+.card{width:90%;max-width:420px;background:rgba(0,0,0,.25);backdrop-filter:blur(14px);border-radius:22px;padding:22px;box-shadow:0 20px 40px rgba(0,0,0,.35);position:relative;}
 h1{text-align:center;margin:6px 0;}
 .timer-frame{padding:6px;border-radius:18px;background:var(--frame);margin:14px 0;width:100%;}
 .countdown{text-align:center;font-size:1.6rem;font-weight:bold;background:rgba(0,0,0,.35);border-radius:14px;padding:10px;}
 body.rgb .timer-frame{background:var(--led);background-size:400% 100%;animation:led 4s linear infinite;}
 @keyframes led{0%{background-position:0%}100%{background-position:400%}}
-.quote{text-align:center;font-style:italic;opacity:.9;}
+.quote{text-align:center;font-style:italic;opacity:.9;margin:6px 0;}
 .hapbar{margin-top:12px;padding:12px;border-radius:14px;background:rgba(0,0,0,.35);font-size:.85rem;text-align:center;display:flex;align-items:center;justify-content:center;min-height:52px;}
 body.night{--bg1:#0F172A;--bg2:#1E293B;--text:#CBD5E1;--accent:#38BDF8;--frame:#38BDF8}
 body.coffee{--bg1:#2B2A2A;--bg2:#3E3B3B;--text:#E6D5B8;--accent:#C58940;--frame:#C58940}
@@ -36,18 +36,14 @@ body.rgb.mode4{--led:linear-gradient(90deg,#8f00ff,#d400ff,#8f00ff)}
 .tabbar button{flex:1;margin:0 6px;padding:10px;border:none;border-radius:14px;background:rgba(255,255,255,.15);color:var(--text);font-weight:bold;}
 .tabbar button.active{background:var(--accent);color:#000;}
 .study-bar{display:flex;justify-content:center;gap:6px;margin:14px 0;flex-wrap:wrap;}
-.study-bar button{padding:6px 10px;border:none;border-radius:10px;background:#fff;color:#000;font-weight:bold;}
+.study-bar button, .study-bar select{padding:6px 10px;border:none;border-radius:10px;background:#fff;color:#000;font-weight:bold;}
 .hidden{display:none;}
-.spotifybar{position:fixed;top:0;left:0;width:100%;height:70px;background:#000;display:flex;align-items:center;justify-content:center;box-shadow:0 5px 20px rgba(0,0,0,.5);z-index:100;}
-.spotifybar iframe{width:300px;height:60px;border:none;border-radius:16px;}
-body.study .spotifybar{opacity:0.6;}
+.spotifybar{position:absolute;bottom:-75px;left:50%;transform:translateX(-50%);width:90%;height:70px;background:transparent;display:flex;align-items:center;justify-content:center;z-index:100;}
+.spotifybar iframe{width:100%;height:60px;border:none;border-radius:16px;}
+.stats-bar{margin-top:10px;text-align:center;font-size:0.85rem;opacity:.9;}
 </style>
 </head>
 <body class="mode1">
-
-<div class="spotifybar">
-<iframe src="https://open.spotify.com/embed/playlist/37i9dQZF1DX8Uebhn9wzrS" allow="encrypted-media"></iframe>
-</div>
 
 <div class="app">
 <div class="card" id="mainCard">
@@ -77,10 +73,20 @@ body.study .spotifybar{opacity:0.6;}
 <button onclick="startDeneme('tyt')">TYT Deneme</button>
 <button onclick="startDeneme('ayt')">AYT Deneme</button>
 <button onclick="stopPomodoro()">Durdur</button>
+<select id="soundSelect">
+<option value="https://www.soundjay.com/buttons/sounds/beep-07.mp3">Beep</option>
+<option value="https://www.soundjay.com/buttons/sounds/button-16.mp3">Ping</option>
+<option value="https://www.soundjay.com/buttons/sounds/button-3.mp3">Ding</option>
+</select>
 </div>
 
 <button style="margin-top:10px;" onclick="toggleStudyMode()" id="studyModeBtn">Çalışma Modu</button>
 
+<div class="stats-bar" id="statsBar">Bugün toplam çalışma: 0 dk</div>
+
+<div class="spotifybar">
+<iframe src="https://open.spotify.com/embed/playlist/37i9dQZF1DX8Uebhn9wzrS" allow="encrypted-media"></iframe>
+</div>
 </div>
 </div>
 
@@ -98,7 +104,6 @@ const infos=["Paragrafta ilk okuma ana fikri verir, ikinci okuma tuzakları ayı
 let rgbMode=1;
 
 function nextRGB(){if(!document.body.classList.contains("rgb"))return; rgbMode=rgbMode%4+1;document.body.className=`rgb mode${rgbMode}`;}
-
 function update(){const diff=dates[current]-Date.now(); if(diff<=0){countdown.innerText="SINAV BAŞLADI";return;} const d=Math.floor(diff/86400000); const h=Math.floor(diff/3600000)%24; const m=Math.floor(diff/60000)%60; const s=Math.floor(diff/1000)%60; countdown.innerText=`${d} gün ${h} sa ${m} dk ${s} sn`;}
 function daily(){const i=new Date().getDate(); quote.innerText=`"${quotes[i%quotes.length]}"`; info.innerText=infos[i%infos.length];}
 function switchTab(t){current=t; title.innerText=t==="tyt"?"TYT 2026":"AYT 2026"; tabTYT.classList.toggle("active",t==="tyt"); tabAYT.classList.toggle("active",t==="ayt"); update();}
@@ -114,26 +119,24 @@ const timerFrame=document.getElementById("timerFrame");
 const quoteEl=document.getElementById("quote");
 const infoEl=document.getElementById("info");
 const studyBar=document.getElementById("studyBar");
+const statsBar=document.getElementById("statsBar");
 let pomodoroInterval;
+let todayWork=parseInt(localStorage.getItem("todayWork")||"0");
+updateStats();
+
+function updateStats(){statsBar.innerText=`Bugün toplam çalışma: ${todayWork} dk`;}
 
 function toggleStudyMode(){
 studyMode=!studyMode;
 document.body.classList.toggle("study",studyMode);
 if(studyMode){
-timerFrame.classList.add("hidden");
-quoteEl.classList.add("hidden");
-infoEl.classList.add("hidden");
-studyBar.classList.remove("hidden");
-themeControls.style.opacity="0.5";
+timerFrame.classList.add("hidden"); quoteEl.classList.add("hidden"); infoEl.classList.add("hidden");
+studyBar.classList.remove("hidden"); themeControls.style.opacity="0.5";
 stopPomodoro();
 }else{
-timerFrame.classList.remove("hidden");
-quoteEl.classList.remove("hidden");
-infoEl.classList.remove("hidden");
-studyBar.classList.add("hidden");
-themeControls.style.opacity="1";
-stopPomodoro();
-update();
+timerFrame.classList.remove("hidden"); quoteEl.classList.remove("hidden"); infoEl.classList.remove("hidden");
+studyBar.classList.add("hidden"); themeControls.style.opacity="1";
+stopPomodoro(); update(); updateStats();
 }
 }
 
@@ -143,18 +146,27 @@ stopPomodoro();
 let endTime=Date.now()+mins*60*1000;
 pomodoroInterval=setInterval(()=>{
 let diff=endTime-Date.now();
-if(diff<=0){stopPomodoro();new Audio('https://www.soundjay.com/buttons/sounds/beep-07.mp3').play();return;}
+if(diff<=0){stopPomodoro();playSound(); todayWork+=mins; localStorage.setItem("todayWork",todayWork); updateStats(); return;}
 let m=Math.floor(diff/60000); let s=Math.floor(diff/1000)%60;
 countdown.innerText=`Pomodoro: ${m} dk ${s} sn`;
 },1000);
 }
+
 function stopPomodoro(){clearInterval(pomodoroInterval); update();}
 
 /* Deneme Modları */
 function startDeneme(type){
 stopPomodoro();
 countdown.innerText=`${type.toUpperCase()} Deneme Modu Başladı!`;
+let dur=60; // Örnek süre 60dk
+pomodoroInterval=setInterval(()=>{
+dur--; if(dur<=0){stopPomodoro();playSound(); todayWork+=60; localStorage.setItem("todayWork",todayWork); updateStats(); return;}
+countdown.innerText=`${type.toUpperCase()} Deneme: ${dur} dk`;
+},60000);
 }
+
+/* Ses seçimi */
+function playSound(){let sel=document.getElementById("soundSelect"); let audio=new Audio(sel.value); audio.play();}
 </script>
 </body>
 </html>

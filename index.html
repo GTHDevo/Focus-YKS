@@ -35,9 +35,10 @@ body.rgb.mode4{--led:linear-gradient(90deg,#8f00ff,#d400ff,#8f00ff)}
 .tabbar{display:flex;justify-content:space-around;padding:10px;background:rgba(0,0,0,.35);}
 .tabbar button{flex:1;margin:0 6px;padding:10px;border:none;border-radius:14px;background:rgba(255,255,255,.15);color:var(--text);font-weight:bold;}
 .tabbar button.active{background:var(--accent);color:#000;}
-.pomodoro-controls{display:flex;gap:8px;justify-content:center;margin-top:12px;}
+.study-bar{display:flex;justify-content:center;gap:6px;margin:14px 0;flex-wrap:wrap;}
+.study-bar button{padding:6px 10px;border:none;border-radius:10px;background:#fff;color:#000;font-weight:bold;}
 .hidden{display:none;}
-.spotifybar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:300px;height:60px;border-radius:16px;overflow:hidden;box-shadow:0 5px 20px rgba(0,0,0,.5);}
+.spotifybar{position:fixed;bottom:10px;left:50%;transform:translateX(-50%);width:300px;height:60px;border-radius:16px;overflow:hidden;box-shadow:0 5px 20px rgba(0,0,0,.5);}
 .spotifybar iframe{width:100%;height:100%;border:none;border-radius:16px;}
 </style>
 </head>
@@ -64,10 +65,12 @@ body.rgb.mode4{--led:linear-gradient(90deg,#8f00ff,#d400ff,#8f00ff)}
 <button id="rgbBtn" onclick="nextRGB()">LED</button>
 </div>
 
-<div class="pomodoro-controls hidden" id="studyControls">
-<button onclick="startPomodoro(25)">25 dk</button>
-<button onclick="startPomodoro(40)">40 dk</button>
-<button onclick="startPomodoro(50)">50 dk</button>
+<div class="study-bar hidden" id="studyBar">
+<button onclick="startPomodoro(25)">Pomodoro 25dk</button>
+<button onclick="startPomodoro(40)">Pomodoro 40dk</button>
+<button onclick="startPomodoro(50)">Pomodoro 50dk</button>
+<button onclick="startDeneme('tyt')">TYT Deneme</button>
+<button onclick="startDeneme('ayt')">AYT Deneme</button>
 <button onclick="stopPomodoro()">Durdur</button>
 </div>
 
@@ -89,7 +92,6 @@ body.rgb.mode4{--led:linear-gradient(90deg,#8f00ff,#d400ff,#8f00ff)}
 /* Ana timer */
 const dates={tyt:new Date("2026-06-20T10:15:00").getTime(),ayt:new Date("2026-06-21T10:15:00").getTime()};
 let current="tyt";
-let interval;
 
 const quotes=["Bugün yaptığın tekrar, sınavda saniye kazandırır.","Netler son ayda değil, her gün birikir.","Sessiz çalış, süre seninle olsun."];
 const infos=["Paragrafta ilk okuma ana fikri verir, ikinci okuma tuzakları ayıklar.","Problemlerde işlemden önce ne istendiğini netleştir.","Grafik sorularında önce eksenleri kontrol et.","Türevde artan-azalan yorumu ezberden güçlüdür.","Denklem çözerken köklerin tanım aralığını unutma.","Kimyasal denge sorularında yön değişimi kilittir."];
@@ -106,7 +108,6 @@ const m=Math.floor(diff/60000)%60;
 const s=Math.floor(diff/1000)%60;
 countdown.innerText=`${d} gün ${h} sa ${m} dk ${s} sn`;
 }
-
 function daily(){const i=new Date().getDate(); quote.innerText=`"${quotes[i%quotes.length]}"`; info.innerText=infos[i%infos.length];}
 
 function switchTab(t){
@@ -130,7 +131,7 @@ const themeControls=document.getElementById("themeControls");
 const timerFrame=document.getElementById("timerFrame");
 const quoteEl=document.getElementById("quote");
 const infoEl=document.getElementById("info");
-const pomodoroControls=document.getElementById("studyControls");
+const studyBar=document.getElementById("studyBar");
 let pomodoroInterval;
 
 function toggleStudyMode(){
@@ -140,14 +141,16 @@ timerFrame.classList.add("hidden");
 quoteEl.classList.add("hidden");
 infoEl.classList.add("hidden");
 themeControls.style.opacity="0.4";
-pomodoroControls.classList.remove("hidden");
+studyBar.classList.remove("hidden");
+stopPomodoro();
 }else{
 timerFrame.classList.remove("hidden");
 quoteEl.classList.remove("hidden");
 infoEl.classList.remove("hidden");
 themeControls.style.opacity="1";
-pomodoroControls.classList.add("hidden");
+studyBar.classList.add("hidden");
 stopPomodoro();
+update();
 }
 }
 
@@ -164,6 +167,12 @@ countdown.innerText=`Pomodoro: ${m} dk ${s} sn`;
 }
 
 function stopPomodoro(){clearInterval(pomodoroInterval); update();}
+
+/* Deneme Modları */
+function startDeneme(type){
+stopPomodoro();
+countdown.innerText=`${type.toUpperCase()} Deneme Modu Başladı!`;
+}
 </script>
 
 </body>

@@ -1,7 +1,7 @@
 {
   "name": "FocusYKS",
   "short_name": "FocusYKS",
-  "start_url": "/Focus-YKS/index.html",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#F5FBE6",
   "theme_color": "#215E61",
